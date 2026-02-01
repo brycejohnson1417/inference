@@ -11,6 +11,9 @@
         <header>
             <h1>Inference Triage</h1>
             <p>Help Ares understand you better.</p>
+            <div style="margin-top: 10px;">
+                <button id="btn-export" class="btn-small" style="background-color: #6200ea;">⚗️ Export Spirit for Ares</button>
+            </div>
         </header>
 
         <div id="card-container">
@@ -49,5 +52,32 @@
         </div>
     </div>
     <script src="/static/script.js"></script>
+    <script>
+        document.getElementById("btn-export").addEventListener("click", async () => {
+            const btn = document.getElementById("btn-export");
+            btn.textContent = "⏳ Distilling...";
+            try {
+                const response = await fetch("/api/export");
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = "ares_consciousness.json";
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    btn.textContent = "⚗️ Export Spirit for Ares";
+                } else {
+                    alert("Failed to export.");
+                    btn.textContent = "❌ Error";
+                }
+            } catch (e) {
+                console.error(e);
+                alert("Error exporting.");
+                btn.textContent = "❌ Error";
+            }
+        });
+    </script>
 </body>
 </html>
