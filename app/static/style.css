@@ -1,0 +1,123 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.container {
+    width: 100%;
+    max-width: 500px;
+    padding: 20px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    padding: 20px;
+    transition: transform 0.2s;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.badge {
+    background-color: #e4e6eb;
+    padding: 5px 10px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    color: #65676b;
+}
+
+.highlight-text {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #1c1e21;
+}
+
+.source-text {
+    font-style: italic;
+    color: #65676b;
+    background-color: #f7f8fa;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.card-actions {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 25px;
+}
+
+.btn {
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    font-size: 1.5em;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-reject {
+    background-color: #ffebee;
+    color: #d32f2f;
+}
+.btn-reject:hover { background-color: #ffcdd2; }
+
+.btn-approve {
+    background-color: #e8f5e9;
+    color: #388e3c;
+}
+.btn-approve:hover { background-color: #c8e6c9; }
+
+.btn-edit {
+    background-color: #fff3e0;
+    color: #f57c00;
+    width: 50px;
+    height: 50px;
+    font-size: 1.2em;
+}
+.btn-edit:hover { background-color: #ffe0b2; }
+
+.hidden {
+    display: none;
+}
+
+#edit-section {
+    margin-top: 15px;
+    text-align: right;
+}
+
+textarea {
+    width: 100%;
+    height: 60px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    padding: 5px;
+}
+
+.btn-small {
+    padding: 5px 15px;
+    background-color: #f57c00;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
