@@ -59,6 +59,21 @@ def init_db(con: sqlite3.Connection) -> None:
         );
         """
     )
+
+    # Brenner-style "appendix": quarantine anomalies/exceptions without deleting
+    con.execute(
+        """
+        CREATE TABLE IF NOT EXISTS anomaly_register (
+          id TEXT PRIMARY KEY,
+          inference_id TEXT,
+          raw_item_id TEXT,
+          kind TEXT,              -- contradiction | exception | data_quality
+          note TEXT,
+          created_at TEXT NOT NULL
+        );
+        """
+    )
+
     con.commit()
 
 
@@ -227,3 +242,39 @@ def import_legacy_json_inferences(con: sqlite3.Connection, json_path: Path) -> i
             continue
 
     return inserted
+
+
+# -------------------------- Anomalies --------------------------
+
+def insert_anomaly(
+    con: sqlite3.Connection,
+    *,
+    anomaly_id: str,
+    inference_id: Optional[str],
+    raw_item_id: Optional[str],
+    kind: str,
+    note: str,
+) -> None:
+    con.execute(
+        """
+        INSERT INTO anomaly_register(id, inference_id, raw_item_id, kind, note, created_at)
+        VALUES(?, ?, ?, ?, ?, ?)
+        """,
+        (
+            anomaly_id,
+            inference_id,
+            raw_item_id,
+            kind,
+            note,
+            datetime.utcnow().isoformat(),
+        ),
+    )
+    con.commit()
+
+
+def list_anomalies(con: sqlite3.Connection, limit: int = 200) -> List[Dict[str, Any]]:
+    cur = con.execute(
+        "SELECT id, inference_id, raw_item_id, kind, note, created_at FROM anomaly_register ORDER BY created_at DESC LIMIT ?",
+        (limit,),
+    )
+    return [dict(r) for r in cur.fetchall()]

@@ -13,6 +13,7 @@ from app.brain import brain  # Import the Brain
 from app.db import sqlite as db_sqlite
 from app.ingestors.chatgpt import ChatGPTIngestor
 from app.ingestors.safari import SafariIngestor
+from app.ranking import triage_score
 
 app = FastAPI()
 
@@ -101,10 +102,12 @@ async def read_root(request: Request):
 
 @app.get("/api/inference")
 async def get_next_inference():
-    inference = db_sqlite.get_next_pending_inference(con)
-    if not inference:
+    # Prefer ranking among pending items (high-signal first)
+    pending = db_sqlite.list_inferences(con, status="pending")
+    if not pending:
         return {"message": "No pending inferences"}
-    return inference
+    pending.sort(key=triage_score, reverse=True)
+    return pending[0]
 
 @app.post("/api/triage")
 async def triage_inference(request: TriageRequest):
