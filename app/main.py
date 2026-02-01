@@ -7,6 +7,8 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from app.brain import brain  # Import the Brain
+from app.ingestors.chatgpt import ChatGPTIngestor
+from app.ingestors.safari import SafariIngestor
 
 app = FastAPI()
 
@@ -121,6 +123,21 @@ async def trigger_generation():
     db.save_all(all_data)
 
     return {"status": "generated", "id": new_inference["id"]}
+
+@app.post("/api/ingest/{source}")
+async def trigger_ingest(source: str):
+    """Trigger ingestion for a specific source."""
+    # Placeholder for connection to real data files
+    if source == "chatgpt":
+        ingestor = ChatGPTIngestor("/path/to/export")
+        # items = ingestor.ingest()
+        return {"status": "ingestion_started", "source": source, "items_count": 0}
+    elif source == "safari":
+        ingestor = SafariIngestor()
+        # items = ingestor.ingest()
+        return {"status": "ingestion_started", "source": source, "items_count": 0}
+    else:
+        raise HTTPException(status_code=400, detail="Unknown source")
 
 if __name__ == "__main__":
     import uvicorn
