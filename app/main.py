@@ -14,8 +14,12 @@ app = FastAPI()
 
 # --- Configuration ---
 DATA_FILE = "inferences.json"
+RAW_DATA_FILE = "raw_data.json"
 
 # --- Models ---
+class IngestRequest(BaseModel):
+    path: str
+
 class Inference(BaseModel):
     id: str
     source: str  # e.g., "iMessage", "Instagram"
@@ -125,19 +129,70 @@ async def trigger_generation():
     return {"status": "generated", "id": new_inference["id"]}
 
 @app.post("/api/ingest/{source}")
-async def trigger_ingest(source: str):
+async def trigger_ingest(source: str, request: IngestRequest):
     """Trigger ingestion for a specific source."""
-    # Placeholder for connection to real data files
     if source == "chatgpt":
-        ingestor = ChatGPTIngestor("/path/to/export")
-        # items = ingestor.ingest()
-        return {"status": "ingestion_started", "source": source, "items_count": 0}
+        ingestor = ChatGPTIngestor(request.path)
     elif source == "safari":
-        ingestor = SafariIngestor()
-        # items = ingestor.ingest()
-        return {"status": "ingestion_started", "source": source, "items_count": 0}
+        ingestor = SafariIngestor(request.path)
     else:
         raise HTTPException(status_code=400, detail="Unknown source")
+
+    items = ingestor.ingest()
+
+    # Persist to raw data file
+    raw_data = []
+    if os.path.exists(RAW_DATA_FILE):
+        try:
+            with open(RAW_DATA_FILE, "r") as f:
+                raw_data = json.load(f)
+        except:
+            pass
+
+    # Convert Pydantic models to dicts
+    new_items = [item.dict() for item in items]
+
+    # Append new items (simple append for now, duplicates possible)
+    # In a real system, we'd check IDs
+    raw_data.extend(new_items)
+
+    with open(RAW_DATA_FILE, "w", default=str) as f:
+        # custom serializer for datetime if needed, or rely on pydantic .dict() handling it mostly?
+        # Actually pydantic .dict() keeps datetime objects which json.dump fails on.
+        # We need to serialize properly.
+        json.dump(raw_data, f, indent=2, default=str)
+
+    return {"status": "success", "source": source, "items_count": len(items)}
+
+@app.post("/api/process")
+async def process_raw_data():
+    """Trigger the Brain to process all raw data."""
+    if not os.path.exists(RAW_DATA_FILE):
+        return {"status": "no_data", "inferences_generated": 0}
+
+    with open(RAW_DATA_FILE, "r") as f:
+        raw_items = json.load(f)
+
+    generated_count = 0
+    new_inferences = []
+
+    # Process batch (limit to 5 for now to avoid freezing)
+    for item in raw_items[:5]:
+        # Skip if we already have an inference for this content? (Simplification: process all)
+
+        # Call Brain
+        # Use brain.process_raw_data logic (we need to update brain.py first or inline it here)
+        # Let's use the existing generate_inference method for now
+        inference = await brain.generate_inference(item["source"], item["content"])
+        new_inferences.append(inference)
+        generated_count += 1
+
+    # Save Inferences
+    all_data = db.load_all()
+    all_data.extend(new_inferences)
+    db.save_all(all_data)
+
+    return {"status": "success", "inferences_generated": generated_count}
 
 if __name__ == "__main__":
     import uvicorn

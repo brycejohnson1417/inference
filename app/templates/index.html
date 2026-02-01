@@ -23,6 +23,24 @@
                     <span class="badge" style="background: #f3e5f5; color: #7b1fa2;">🧠 Curious Self</span>
                 </div>
             </div>
+
+            <div id="ingestion-section" style="margin-top: 20px; background: #fff; padding: 15px; border-radius: 8px;">
+                <h3>Data Ingestion</h3>
+                <div class="input-group">
+                    <label>ChatGPT Export Path:</label>
+                    <input type="text" id="path-chatgpt" placeholder="/Users/bryce/Downloads/package" style="width: 100%; margin-bottom: 5px;">
+                    <button id="btn-ingest-chatgpt" class="btn-small">Load ChatGPT Data</button>
+                </div>
+                <div class="input-group" style="margin-top: 10px;">
+                    <label>Safari History DB Path:</label>
+                    <input type="text" id="path-safari" placeholder="/Users/bryce/Library/Safari/History.db" style="width: 100%; margin-bottom: 5px;">
+                    <button id="btn-ingest-safari" class="btn-small">Load Safari History</button>
+                </div>
+                <div style="margin-top: 15px; text-align: center;">
+                    <button id="btn-process-all" class="btn-small" style="background-color: #2e7d32; width: 100%;">🧠 Process All Raw Data (Run Brain)</button>
+                </div>
+                <p id="ingest-status" style="font-size: 0.9em; color: #666; margin-top: 5px;"></p>
+            </div>
         </header>
 
         <div id="card-container">
@@ -62,6 +80,7 @@
     </div>
     <script src="/static/script.js"></script>
     <script>
+        // Export Logic
         document.getElementById("btn-export").addEventListener("click", async () => {
             const btn = document.getElementById("btn-export");
             btn.textContent = "⏳ Distilling...";
@@ -85,6 +104,55 @@
                 console.error(e);
                 alert("Error exporting.");
                 btn.textContent = "❌ Error";
+            }
+        });
+
+        // Ingestion Logic
+        async function triggerIngest(source, pathId, statusMsg) {
+            const path = document.getElementById(pathId).value;
+            if (!path) {
+                alert("Please enter a path.");
+                return;
+            }
+
+            const statusEl = document.getElementById("ingest-status");
+            statusEl.textContent = `Loading ${source}...`;
+
+            try {
+                const response = await fetch(`/api/ingest/${source}`, {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({path: path})
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    statusEl.textContent = `✅ ${data.items_count} items loaded from ${source}.`;
+                } else {
+                    statusEl.textContent = `❌ Error: ${data.detail}`;
+                }
+            } catch (e) {
+                statusEl.textContent = "❌ Network Error";
+            }
+        }
+
+        document.getElementById("btn-ingest-chatgpt").addEventListener("click", () =>
+            triggerIngest("chatgpt", "path-chatgpt", "ChatGPT"));
+
+        document.getElementById("btn-ingest-safari").addEventListener("click", () =>
+            triggerIngest("safari", "path-safari", "Safari"));
+
+        // Process Logic
+        document.getElementById("btn-process-all").addEventListener("click", async () => {
+            const statusEl = document.getElementById("ingest-status");
+            statusEl.textContent = "🧠 Brain is processing raw data... (this may take a while)";
+            try {
+                const response = await fetch("/api/process", {method: "POST"});
+                const data = await response.json();
+                statusEl.textContent = `✅ Processing complete. Generated ${data.inferences_generated} new inferences.`;
+                // Reload page to show new inferences? or just fetchNext
+                fetchInference();
+            } catch (e) {
+                statusEl.textContent = "❌ Brain Error";
             }
         });
     </script>
