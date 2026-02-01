@@ -6,7 +6,8 @@ This application is a "Tinder for Inferences" triage tool. It is designed to hel
 ## Features
 *   **Triage Interface**: Swipe-like interface to Approve (True) or Reject (False) inferences.
 *   **Context Aware**: Shows the source data (e.g., the text message) alongside the AI's conclusion.
-*   **JSON Persistence**: Saves your validated knowledge graph components for later use by your "Ares" agent.
+*   **Durable storage**: Uses a local **SQLite** database for inferences/raw items (with legacy JSON fallback).
+*   **Export**: Saves your validated knowledge graph components for later use by your "Ares" agent.
 
 ## Getting Started
 
@@ -25,12 +26,18 @@ This application is a "Tinder for Inferences" triage tool. It is designed to hel
     ```bash
     python scripts/generate_mock_data.py
     ```
-    *This creates a `inferences.json` file with sample connections (e.g., linking iMessage mentions to Instagram profiles).*
+    *This creates an `inferences.json` file with sample connections (legacy format; it will be imported into SQLite on startup).* 
 
 2.  **Start the Server**:
     ```bash
     uvicorn app.main:app --reload
     ```
+
+Optional environment variables:
+```bash
+export JARVIS_SQLITE_PATH="./jarvis.sqlite3"
+export JARVIS_PROCESS_BATCH_SIZE="25"
+```
 
 3.  **Open the App**:
     Navigate to `http://localhost:8000` in your browser.
