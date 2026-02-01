@@ -4,7 +4,9 @@ from typing import List, Optional
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
+from app.brain import brain  # Import the Brain
 
 app = FastAPI()
 
@@ -93,6 +95,32 @@ async def triage_inference(request: TriageRequest):
     if not success:
         raise HTTPException(status_code=404, detail="Inference not found")
     return {"status": "success"}
+
+@app.get("/api/export")
+async def export_consciousness():
+    """Export all APPROVED inferences for Ares."""
+    all_data = db.load_all()
+    # Filter for approved inferences
+    spirit_data = [item for item in all_data if item.get("status") == "approved"]
+
+    return JSONResponse(
+        content=spirit_data,
+        headers={"Content-Disposition": "attachment; filename=ares_consciousness.json"}
+    )
+
+@app.post("/api/generate")
+async def trigger_generation():
+    """Trigger the Brain to generate a new inference (Manual trigger for now)."""
+    # In a real app, this would loop through the database.
+    # Here we just generate one random mock/AI inference.
+    new_inference = await brain.generate_inference("Random Source", "Random content snippet...")
+
+    # Save to DB
+    all_data = db.load_all()
+    all_data.append(new_inference)
+    db.save_all(all_data)
+
+    return {"status": "generated", "id": new_inference["id"]}
 
 if __name__ == "__main__":
     import uvicorn
