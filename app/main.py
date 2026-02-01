@@ -1,20 +1,27 @@
 import json
 import os
 from typing import List, Optional
+
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
+
+from app import config
 from app.brain import brain  # Import the Brain
+from app.db import sqlite as db_sqlite
 from app.ingestors.chatgpt import ChatGPTIngestor
 from app.ingestors.safari import SafariIngestor
+from app.ranking import triage_score
 
 app = FastAPI()
 
 # --- Configuration ---
-DATA_FILE = "inferences.json"
-RAW_DATA_FILE = "raw_data.json"
+# Prefer SQLite for durability. Keep legacy JSON paths for import/fallback.
+SQLITE_PATH = config.SQLITE_PATH
+DATA_FILE = str(config.INFERENCES_JSON_PATH)
+RAW_DATA_FILE = str(config.RAW_DATA_JSON_PATH)
 
 # --- Models ---
 class IngestRequest(BaseModel):
@@ -75,6 +82,12 @@ class InferencesDB:
             self.save_all(data)
         return found
 
+# --- Persistence ---
+con = db_sqlite.connect(SQLITE_PATH)
+db_sqlite.init_db(con)
+# One-time best-effort import of legacy JSON inferences so existing users keep state.
+db_sqlite.import_legacy_json_inferences(con, config.INFERENCES_JSON_PATH)
+
 db = InferencesDB(DATA_FILE)
 
 # --- Routes ---
@@ -89,15 +102,17 @@ async def read_root(request: Request):
 
 @app.get("/api/inference")
 async def get_next_inference():
-    inference = db.get_pending()
-    if not inference:
+    # Prefer ranking among pending items (high-signal first)
+    pending = db_sqlite.list_inferences(con, status="pending")
+    if not pending:
         return {"message": "No pending inferences"}
-    return inference
+    pending.sort(key=triage_score, reverse=True)
+    return pending[0]
 
 @app.post("/api/triage")
 async def triage_inference(request: TriageRequest):
     new_status = "approved" if request.action == "approve" else "rejected"
-    success = db.update_status(request.id, new_status, request.notes)
+    success = db_sqlite.update_inference_status(con, request.id, new_status, request.notes)
     if not success:
         raise HTTPException(status_code=404, detail="Inference not found")
     return {"status": "success"}
@@ -105,26 +120,27 @@ async def triage_inference(request: TriageRequest):
 @app.get("/api/export")
 async def export_consciousness():
     """Export all APPROVED inferences for Ares."""
-    all_data = db.load_all()
-    # Filter for approved inferences
-    spirit_data = [item for item in all_data if item.get("status") == "approved"]
+    spirit_data = db_sqlite.list_inferences(con, status="approved")
 
     return JSONResponse(
         content=spirit_data,
-        headers={"Content-Disposition": "attachment; filename=ares_consciousness.json"}
+        headers={"Content-Disposition": "attachment; filename=ares_consciousness.json"},
     )
 
 @app.post("/api/generate")
 async def trigger_generation():
-    """Trigger the Brain to generate a new inference (Manual trigger for now)."""
-    # In a real app, this would loop through the database.
-    # Here we just generate one random mock/AI inference.
+    """Trigger the Brain to generate a new inference (manual trigger for now)."""
     new_inference = await brain.generate_inference("Random Source", "Random content snippet...")
 
-    # Save to DB
-    all_data = db.load_all()
-    all_data.append(new_inference)
-    db.save_all(all_data)
+    db_sqlite.insert_inference(
+        con,
+        inference_id=new_inference["id"],
+        source=new_inference["source"],
+        content=new_inference["content"],
+        inference=new_inference["inference"],
+        confidence=new_inference.get("confidence", 0.0),
+        status=new_inference.get("status", "pending"),
+    )
 
     return {"status": "generated", "id": new_inference["id"]}
 
@@ -140,60 +156,57 @@ async def trigger_ingest(source: str, request: IngestRequest):
 
     items = ingestor.ingest()
 
-    # Persist to raw data file
+    # Persist to SQLite (primary)
+    stored = db_sqlite.upsert_raw_items(con, items)
+
+    # Also persist to legacy raw_data.json for now (compat/debug)
     raw_data = []
     if os.path.exists(RAW_DATA_FILE):
         try:
             with open(RAW_DATA_FILE, "r") as f:
                 raw_data = json.load(f)
-        except:
-            pass
+        except Exception:
+            raw_data = []
 
-    # Convert Pydantic models to dicts
     new_items = [item.dict() for item in items]
-
-    # Append new items (simple append for now, duplicates possible)
-    # In a real system, we'd check IDs
     raw_data.extend(new_items)
 
-    with open(RAW_DATA_FILE, "w", default=str) as f:
-        # custom serializer for datetime if needed, or rely on pydantic .dict() handling it mostly?
-        # Actually pydantic .dict() keeps datetime objects which json.dump fails on.
-        # We need to serialize properly.
+    with open(RAW_DATA_FILE, "w") as f:
         json.dump(raw_data, f, indent=2, default=str)
 
-    return {"status": "success", "source": source, "items_count": len(items)}
+    return {"status": "success", "source": source, "items_count": len(items), "stored": stored}
 
 @app.post("/api/process")
 async def process_raw_data():
-    """Trigger the Brain to process all raw data."""
-    if not os.path.exists(RAW_DATA_FILE):
+    """Trigger the Brain to process raw data and generate triage inferences."""
+
+    # Prefer SQLite raw items; fall back to legacy json.
+    raw_items = db_sqlite.list_raw_items(con, limit=config.PROCESS_BATCH_SIZE)
+    if not raw_items and os.path.exists(RAW_DATA_FILE):
+        with open(RAW_DATA_FILE, "r") as f:
+            raw_items = json.load(f)
+
+    if not raw_items:
         return {"status": "no_data", "inferences_generated": 0}
 
-    with open(RAW_DATA_FILE, "r") as f:
-        raw_items = json.load(f)
-
     generated_count = 0
-    new_inferences = []
 
-    # Process batch (limit to 5 for now to avoid freezing)
-    for item in raw_items[:5]:
-        # Skip if we already have an inference for this content? (Simplification: process all)
-
-        # Call Brain
-        # Use brain.process_raw_data logic (we need to update brain.py first or inline it here)
-        # Let's use the existing generate_inference method for now
+    # Process batch
+    for item in raw_items[: config.PROCESS_BATCH_SIZE]:
         inference = await brain.generate_inference(item["source"], item["content"])
-        new_inferences.append(inference)
+        db_sqlite.insert_inference(
+            con,
+            inference_id=inference["id"],
+            source=inference["source"],
+            content=inference["content"],
+            inference=inference["inference"],
+            confidence=inference.get("confidence", 0.0),
+            status=inference.get("status", "pending"),
+        )
         generated_count += 1
-
-    # Save Inferences
-    all_data = db.load_all()
-    all_data.extend(new_inferences)
-    db.save_all(all_data)
 
     return {"status": "success", "inferences_generated": generated_count}
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host=config.HOST, port=config.PORT)
