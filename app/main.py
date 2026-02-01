@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from app.brain import brain  # Import the Brain
 from app.ingestors.chatgpt import ChatGPTIngestor
 from app.ingestors.safari import SafariIngestor
+from app.lint import lint_inference_candidate
 
 app = FastAPI()
 
@@ -178,12 +179,14 @@ async def process_raw_data():
 
     # Process batch (limit to 5 for now to avoid freezing)
     for item in raw_items[:5]:
-        # Skip if we already have an inference for this content? (Simplification: process all)
-
         # Call Brain
-        # Use brain.process_raw_data logic (we need to update brain.py first or inline it here)
-        # Let's use the existing generate_inference method for now
         inference = await brain.generate_inference(item["source"], item["content"])
+
+        # Brenner-style linting: skip low-quality candidates rather than polluting triage
+        issues = lint_inference_candidate(inference)
+        if issues:
+            continue
+
         new_inferences.append(inference)
         generated_count += 1
 
