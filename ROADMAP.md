@@ -13,9 +13,7 @@ To create a "Digital Spirit" (a distillation of your personality, memories, and 
 *   **Components**:
     *   **Data Silos**: iMessage (`chat.db`), Social Exports, Notes.
     *   **The Brain (Ollama)**: A local LLM that reads raw data and extracts "Inferences" (Facts/Insights).
-    *   **The Triage App (This Program)**: You manually review every insight.
-        *   *Machine*: "User likes hiking." -> *You*: "True (Approve)".
-        *   *Machine*: "User hates pizza." -> *You*: "False (Reject)".
+    *   **The Triage App**: You manually review every insight.
     *   **The Output**: A pure JSON file of *validated* truths. This is the "Digital Spirit".
 
 ### 2. The Avatar: "Ares" (VPS / Ubuntu)
@@ -23,13 +21,33 @@ To create a "Digital Spirit" (a distillation of your personality, memories, and 
 *   **Why**: Running 24/7 on a server to act on your behalf.
 *   **Constraint**: 4GB RAM is too small for heavy training, but perfect for *running* a highly optimized agent.
 *   **Input**: Ares does *not* read your iMessage database. He reads the **Digital Spirit JSON** exported from Jarvis.
-*   **Result**: Ares "knows" you like hiking because you told him via the Spirit file, not because he snooped on your texts.
+
+## Advanced Inference Architecture (New)
+
+We are upgrading the system from simple "Fact Extraction" to **Cross-Contextualized Intelligence**.
+
+### Core Systems
+1.  **Entity Resolution**: Recognizing that "Mom", "Mother", and "Sandra" are the same person across iMessage, Email, and Photos.
+2.  **Temporal Reasoning**: Understanding *when* things happened.
+    *   *Example*: "You used to like coffee, but switched to tea in 2024."
+3.  **Behavioral Archetypes**: Understanding *how* you act in different contexts.
+    *   **Bot Self**: How you prompt AI (from ChatGPT/Claude logs).
+    *   **Social Self**: How you text friends (from iMessage).
+    *   **Professional Self**: How you email (from Work Email).
+    *   **Curious Self**: What you research (from Safari History).
+    *   **Temporal Self**: When you are productive vs. relaxing.
+
+### Multi-Hop Inference
+Connecting dots across sources:
+*   *Data 1 (Safari)*: You researched "Best hiking boots".
+*   *Data 2 (Calendar)*: You have a trip to Yosemite next week.
+*   *Inference*: "You are planning a hiking trip to Yosemite and need gear."
 
 ## Workflow: How to run this
 
 1.  **Start the Brain (on Jarvis)**
     *   Install **Ollama** (https://ollama.com).
-    *   Run `ollama run llama3` in your terminal. This wakes up the AI.
+    *   Run `ollama run llama3` in your terminal.
 
 2.  **Run the Triage App**
     *   Use the `start_jarvis.sh` script included in this repo.
@@ -45,4 +63,3 @@ To create a "Digital Spirit" (a distillation of your personality, memories, and 
 
 5.  **Awaken Ares**
     *   Upload `ares_consciousness.json` to your VPS.
-    *   Ares loads this into his memory (Vector DB or System Prompt) and instantly "becomes" you.
