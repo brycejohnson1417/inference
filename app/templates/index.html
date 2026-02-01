@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inference Triage</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Inference Triage</h1>
+            <p>Help Ares understand you better.</p>
+        </header>
+
+        <div id="card-container">
+            <div id="inference-card" class="card">
+                <div class="card-header">
+                    <span id="source-badge" class="badge">Source</span>
+                    <span id="confidence-badge" class="badge">Conf: 0.0</span>
+                </div>
+
+                <div class="card-body">
+                    <h3>Inference:</h3>
+                    <p id="inference-text" class="highlight-text">Loading...</p>
+
+                    <hr>
+
+                    <h4>Context / Evidence:</h4>
+                    <p id="content-text" class="source-text">...</p>
+                </div>
+
+                <div class="card-actions">
+                    <button id="btn-reject" class="btn btn-reject">✖ Reject</button>
+                    <button id="btn-edit" class="btn btn-edit">✎ Edit</button>
+                    <button id="btn-approve" class="btn btn-approve">✔ Approve</button>
+                </div>
+
+                <div id="edit-section" class="hidden">
+                    <textarea id="edit-notes" placeholder="Add context or correct the inference..."></textarea>
+                    <button id="btn-submit-edit" class="btn btn-small">Save & Approve</button>
+                </div>
+            </div>
+
+            <div id="empty-state" class="hidden">
+                <h2>All caught up!</h2>
+                <p>No more pending inferences.</p>
+            </div>
+        </div>
+    </div>
+    <script src="/static/script.js"></script>
+</body>
+</html>

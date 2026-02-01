@@ -1,0 +1,6 @@
+__pycache__/
+*.log
+*.json
+!inferences.json
+venv/
+.DS_Store
