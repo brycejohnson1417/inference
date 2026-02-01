@@ -42,7 +42,7 @@ class Brain:
         """
         if not await self.is_alive():
             # Fallback to mock logic if brain is offline
-            print("⚠️ Brain (Ollama) is offline. Using mock logic.")
+            # print("⚠️ Brain (Ollama) is offline. Using mock logic.")
             return self._mock_inference(source, content)
 
         prompt = f"""
