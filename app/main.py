@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from app.brain import brain  # Import the Brain
 from app.ingestors.chatgpt import ChatGPTIngestor
 from app.ingestors.safari import SafariIngestor
+from app.security import safe_to_export
 
 app = FastAPI()
 
@@ -104,14 +105,28 @@ async def triage_inference(request: TriageRequest):
 
 @app.get("/api/export")
 async def export_consciousness():
-    """Export all APPROVED inferences for Ares."""
+    """Export all APPROVED inferences for Ares.
+
+    Security: This endpoint blocks export if the payload appears to contain secrets
+    (API keys, tokens, private keys, etc.).
+    """
     all_data = db.load_all()
+
     # Filter for approved inferences
     spirit_data = [item for item in all_data if item.get("status") == "approved"]
 
+    # Gate export: scan serialized payload for common secret patterns.
+    ok, hits = safe_to_export(json.dumps(spirit_data, ensure_ascii=False))
+    if not ok:
+        # Do NOT include raw matches; only a count.
+        raise HTTPException(
+            status_code=400,
+            detail=f"Blocked export: detected {len(hits)} potential secret(s) in approved inferences. Please sanitize and try again.",
+        )
+
     return JSONResponse(
         content=spirit_data,
-        headers={"Content-Disposition": "attachment; filename=ares_consciousness.json"}
+        headers={"Content-Disposition": "attachment; filename=ares_consciousness.json"},
     )
 
 @app.post("/api/generate")
