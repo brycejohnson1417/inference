@@ -1101,3 +1101,642 @@ class DigitalSpiritExporter:
 2. Start with Sprint 1 (Foundation) - especially the Contacts ingestor
 3. The Contacts → Entity Resolution pipeline is the critical path
 4. Test with real data early - entity resolution quality depends on real-world patterns
+
+---
+
+# APPENDIX: Research & Implementation Suggestions
+
+The following sections contain 300+ curated suggestions from research across multiple AI systems and academic sources. These are organized by category for easy reference during implementation.
+
+---
+
+## A. Behavioral Fingerprint Features (70+ Extractable Signals)
+
+**Key Insight**: These features capture HOW you communicate without storing WHAT you say. Think "feature vectors," not transcripts.
+
+### A.1 Stylometry & Surface Fingerprints (Message-Level)
+
+| # | Feature | Description |
+|---|---------|-------------|
+| 1 | Character n-grams | Robust stylometry baseline; content-light |
+| 2 | Word-shape features | Xxxx vs xxxx vs XXXX, digit patterns |
+| 3 | Punctuation profile | Periods vs dashes vs semicolons vs ellipses |
+| 4 | Emoji usage histogram | Types, density, position (start/middle/end) |
+| 5 | Exclamation/question rates | And combos like "?!", "!!", "??" |
+| 6 | Capitalization habits | ALL CAPS bursts, sentence-case consistency |
+| 7 | Contraction rate | "I'm" vs "I am" as informality marker |
+| 8 | Average message length + variance | Per-platform distribution |
+| 9 | Sentence count per message | Single-shot vs multi-sentence style |
+| 10 | Link/media attachment frequency | URLs, images, voice notes as behavior |
+
+### A.2 Syntax & Structure (How You Build Sentences)
+
+| # | Feature | Description |
+|---|---------|-------------|
+| 11 | POS-tag n-grams | Part-of-speech patterns; less content-dependent |
+| 12 | Dependency depth stats | Simple vs nested syntax |
+| 13 | Clause/subordination rate | "because/although/while" usage |
+| 14 | Passive voice probability | Correlates with formality/hedging |
+| 15 | Question vs statement ratio | Curiosity/leadership signal |
+| 16 | List/formatting habits | Bullets, numbering, line breaks |
+| 17 | Discourse marker frequency | "so," "anyway," "btw," "tbh" |
+
+### A.3 Formality, Assertiveness, Politeness (Pragmatics)
+
+| # | Feature | Description |
+|---|---------|-------------|
+| 18 | Formality score | Via feature mix (contractions↓, slang↓, structure↑) |
+| 19 | Readability indices | Flesch–Kincaid, Gunning Fog as style proxies |
+| 20 | Hedge density | "maybe," "kinda," "I think," "might" |
+| 21 | Certainty markers | "definitely," "no doubt," "I'm sure" |
+| 22 | Imperative/directive rate | "Do X" vs "Could we…" |
+| 23 | Modal verbs balance | "should" vs "could" vs "must" |
+| 24 | Politeness classifier score | please/thanks/apologies + phrasing cues |
+| 25 | Boundary-setting markers | "can't," "not possible," "won't," "later" |
+
+### A.4 Sentiment & Affect (Tone, Not Topics)
+
+| # | Feature | Tool/Method |
+|---|---------|-------------|
+| 26 | VADER sentiment | Fast + good for short informal messages |
+| 27 | TextBlob sentiment/subjectivity | Simple baseline |
+| 28 | Flair sentiment | Stronger ML baseline |
+| 29 | Transformer sentiment | Hugging Face models for nuance |
+| 30 | Emotion lexicons | Joy/anger/sadness/fear distributions |
+| 31 | Arousal/valence scoring | Calm vs excited tone over time |
+| 32 | Sentiment volatility | How swingy your tone is across a thread |
+| 33 | Tone mirroring | Do you match the other person's sentiment? |
+
+### A.5 Temporal Patterns & Responsiveness
+
+| # | Feature | Description |
+|---|---------|-------------|
+| 34 | Response latency distribution | Per contact (median, p90, long-tail) |
+| 35 | Time-to-first-reply survival models | Hazard of replying vs time |
+| 36 | Circadian + weekday heatmaps | When you initiate vs respond |
+| 37 | Burstiness (inter-message CV) | Steady chatter vs clustered bursts |
+| 38 | Sessionization by idle gaps | Define "conversations" from timestamps |
+| 39 | Double-text rate | You send again before they reply |
+| 40 | Escalation behavior | Switch to call/voice note when delayed |
+| 41 | Priority inference model | Predict reply speed from non-content cues |
+
+### A.6 Cross-Platform Persona Comparison
+
+| # | Feature | Description |
+|---|---------|-------------|
+| 42 | Platform-specific normalization | Compare z-scored features, not raw |
+| 43 | Platform embeddings | One "style vector" per platform, same schema |
+| 44 | KL-divergence | Between platform feature distributions (persona gap) |
+| 45 | Domain adaptation | Separate "you" signal from platform artifacts |
+| 46 | Multitask model | Shared backbone + platform "heads" |
+| 47 | Invariance tests | Which features stay stable across platforms? |
+| 48 | Style drift tracking | How your platform persona changes monthly |
+
+### A.7 Conversation-Level Dynamics (Thread Behavior)
+
+| # | Feature | Description |
+|---|---------|-------------|
+| 49 | Turn-taking ratio | Who dominates; your share of turns |
+| 50 | Initiation rate | How often you start threads vs respond |
+| 51 | Thread length distribution | Quick closes vs long dialogues |
+| 52 | Question-asking cadence | Questions per 10 turns |
+| 53 | Repair/clarification moves | "wait," "to clarify," "meaning…" frequency |
+| 54 | Closure signatures | How you end: "cool/thanks/✅/talk soon" |
+| 55 | Latency elasticity | Do you speed up once the thread is "hot"? |
+
+### A.8 Relationship Strength Inference (Non-Content)
+
+| # | Feature | Description |
+|---|---------|-------------|
+| 56 | Interaction frequency | Rolling 7/30/90-day message counts |
+| 57 | Reciprocity index | Sent/received balance |
+| 58 | Mutual responsiveness | Both parties' median reply time |
+| 59 | Regularity/entropy | Of contact times (routine vs sporadic) |
+| 60 | Relationship longevity | Active months; reactivation patterns |
+| 61 | Language-style matching (LSM) | Function-word alignment |
+| 62 | Coordination markers rate | "let's," "we should," scheduling patterns |
+| 63 | Context switching | Work-hours only vs all-hours availability |
+| 64 | Network features | Shared groups, triadic closure, centrality |
+
+### A.9 Privacy-Preserving Feature Engineering
+
+| # | Technique | Description |
+|---|-----------|-------------|
+| 65 | Named-entity stripping | Keep only counts/types, not the entities |
+| 66 | Hashing trick for n-grams | Store hashes, not tokens |
+| 67 | Store aggregates only | Per-contact/per-platform histograms, not text |
+| 68 | Random projections | Obfuscate feature vectors against inversion |
+| 69 | Differential privacy noise | On sensitive aggregates (contact-level stats) |
+| 70 | On-device extraction | Raw text never leaves local machine |
+
+### A.10 Implementation Pattern
+
+```
+raw text → ephemeral parsing → feature vector → discard raw → train/predict on vectors
+```
+
+You get "you-ness" without the gossip. This creates a **behavioral genome**: stable traits (punctuation, hedging, timing) + situational traits (platform, relationship, urgency).
+
+---
+
+## B. LLM Optimization for M2 MacBook (16GB RAM)
+
+### B.1 Batching Strategies
+
+| Strategy | Description |
+|----------|-------------|
+| Process in chunks | 100–200 messages at a time to prevent OOM |
+| Group by length/source | Uniform-length batches make efficient use of context window |
+| Multi-item prompts | List several items in one prompt, ask model to respond to each |
+| Hierarchical summarization | First summarize chunks, then summarize summaries |
+| Asynchronous processing | Overlap I/O and computation to keep pipeline busy |
+| Continuous batching | Use vLLM or ray for automatic batching if applicable |
+
+### B.2 Embeddings vs LLM Calls Decision Matrix
+
+| Use Embeddings For | Use LLM Calls For |
+|--------------------|-------------------|
+| Search & recall (index data, find similar) | Complex reasoning requiring interpretation |
+| Retrieval-augmented queries (RAG) | Summarizing conversation meaning |
+| Clustering and trend analysis | Extracting nuanced sentiments |
+| Finding duplicates | Generating new text |
+| Recommending similar notes | Understanding context |
+
+### B.3 Model Selection Guide
+
+| Model | Params | Use Case | Notes |
+|-------|--------|----------|-------|
+| **Phi-3 mini** | 3.8B | Quick classification, filtering | Matches 7B+ on reasoning, 128K context |
+| **Mistral 7B** | 7B | General tasks | Outperforms Llama-2 13B, efficient architecture |
+| **Llama 3 8B** | 8B | Dialogue, complex analysis | Good all-rounder |
+| **spaCy/DistilBERT** | ~100M | NER, sentiment, language detection | CPU-friendly, deterministic |
+
+### B.4 Prompt Engineering for Structured Output
+
+- **Define clear format**: "Provide output as JSON with keys: date, sender, summary"
+- **Use delimiters**: Triple backticks for code/data segments
+- **Provide examples**: Few-shot with input → output pairs
+- **Ask for lists/tables**: Easier to parse than prose
+- **Iterative refinement**: Secondary prompt to reformat if needed
+- **Avoid open-ended**: Specific instructions reduce variability
+
+### B.5 Caching Strategies
+
+| Strategy | Description |
+|----------|-------------|
+| Memoize repeated queries | Cache results keyed by hash of prompt text |
+| Embed once, use many | Generate embeddings once, save to disk |
+| Intermediate results caching | Cache outputs of each pipeline stage |
+| Exact-match prompt cache | Key-value store for identical prompts |
+| Semantic caching | Reuse past result if new prompt is very similar |
+
+### B.6 Regex vs LLM Decision
+
+| Use Regex For | Use LLM For |
+|---------------|-------------|
+| Deterministic patterns (emails, phones, dates, URLs) | Context-dependent fuzzy extraction |
+| Well-defined formats | Variable formats requiring interpretation |
+| Speed-critical paths | "Find all mentions of project delays" |
+| 100% consistency needed | Complex semantic understanding |
+
+**Pro tip**: LLM-generated regex – ask the LLM to produce a regex pattern, then use that regex directly.
+
+### B.7 Quantization
+
+| Level | Memory Reduction | Quality Impact | Notes |
+|-------|------------------|----------------|-------|
+| 4-bit | ~75% | Minor (<1%) | Ollama default, recommended |
+| 5-bit | ~68% | Minimal | Good balance |
+| 8-bit | ~50% | Near-identical | Higher quality if RAM allows |
+
+### B.8 Parallel Processing on Apple Silicon
+
+- **Multi-core**: Run independent tasks in parallel threads (8 cores available)
+- **Avoid bandwidth saturation**: CPU + GPU share memory bandwidth
+- **Mix workloads**: Use GPU for LLM, CPU for preprocessing simultaneously
+- **Threading in libraries**: Configure llama.cpp threads (-t 4-6)
+- **Memory caution**: Two 7B models in parallel = ~16GB (will swap)
+
+### B.9 Memory Management
+
+- **7B model in 4-bit**: ~8GB RAM (safe for 16GB Mac)
+- **13B model in 4-bit**: ~16GB RAM (leaves nothing for OS)
+- **One model at a time**: Load embedding model → process → unload → load LLM
+- **Stream data from disk**: Don't load entire dataset into RAM
+- **Clear context frequently**: Reset LLM context after it grows large
+
+---
+
+## C. Entity Resolution Research & Techniques
+
+### C.1 Algorithms & Matching
+
+| Technique | Description | Tool/Library |
+|-----------|-------------|--------------|
+| Probabilistic Record Linkage | Fellegi-Sunter model with weighted attributes | Splink |
+| Deterministic Rules | Exact match on unique IDs (email, phone) | Custom |
+| Jaro-Winkler | Fuzzy string matching for similar names | jellyfish |
+| Phonetic Encoding | Soundex, Metaphone for pronunciation matching | jellyfish |
+| Blocking | Group by coarse key before detailed comparison | dedupe |
+| Two-pass Matching | Quick pass for obvious matches, then fuzzy | Custom |
+| Graph Connectivity | Union-find on match edges | NetworkX |
+| Active Learning | Label a few pairs, model improves | dedupe |
+| Siamese Networks | Neural network comparing record pairs | DeepMatcher |
+
+### C.2 Knowledge Graph Design
+
+```
+Person (node)
+  ├── HAS_ACCOUNT → Instagram Account (@looganoo)
+  ├── HAS_ACCOUNT → iMessage Handle (+1234567890)
+  ├── HAS_ACCOUNT → Email (logan@example.com)
+  ├── ALIAS → "Logan", "LR", "Ruddick"
+  └── FRIEND_OF → Other Person nodes
+```
+
+### C.3 Name Matching & Embeddings
+
+- **Embed names**: Use sentence-transformers to catch "Jon" vs "Johnathan"
+- **Profile text embeddings**: Similar bios = likely same person
+- **FastText for names**: Handles unusual names via subword patterns
+- **Composite embeddings**: "Alex Lee California" vs "Alex Lee New York"
+- **Vector search**: FAISS/Annoy for nearest neighbors
+
+### C.4 Tools & Libraries
+
+| Tool | Description |
+|------|-------------|
+| **dedupe** | ML-based matching with active learning |
+| **Splink** | Probabilistic linkage, scales to millions |
+| **PyJedAI** | State-of-the-art ER algorithms in Python |
+| **DeepMatcher** | Neural network for entity matching |
+| **recordlinkage** | Simple Python interface for prototyping |
+| **jellyfish** | Fast phonetic keys and string distance |
+| **NetworkX** | In-memory graph for entity networks |
+| **Neo4j** | Graph database for complex queries |
+
+### C.5 Heuristics for Nicknames/Typos
+
+| Heuristic | Example |
+|-----------|---------|
+| Nickname dictionary | Bob → Robert, Liz → Elizabeth |
+| Case/accent normalization | José = Jose, Özil = Ozil |
+| Edit distance threshold | Allow distance 1-2 for typos |
+| Initials handling | "John P. Doe" ≈ "John Doe" |
+| Transliteration | "Алексей" → "Alexey" |
+
+### C.6 Academic Papers
+
+| Paper | Key Insight |
+|-------|-------------|
+| Shu et al. (2017) | Survey of cross-platform identity linkage |
+| Hydra (SIGMOD 2014) | Multi-behavioral features improve accuracy |
+| Bartunov et al. (2012) | Network links + profile attributes together |
+| Zhang et al. (2020) | Graph embeddings for user alignment |
+
+---
+
+## D. Embeddings & Vector Search Optimization
+
+### D.1 Model Selection
+
+| Model | Dims | Speed | Use Case |
+|-------|------|-------|----------|
+| MiniLM | 384 | Fast | Good for resource-constrained |
+| MPNet | 768 | Medium | Higher accuracy |
+| BGE-en | 1024 | Slow | State-of-the-art |
+| nomic-embed-text | 768 | Fast | Ollama-compatible |
+
+### D.2 Quantization
+
+| Level | Reduction | Method |
+|-------|-----------|--------|
+| Float32 → Uint8 | 75% | Qdrant scalar quantization |
+| Float32 → Binary | 96% (32×) | Hamming distance search |
+| Product Quantization | Variable | Faiss IVF-PQ |
+
+### D.3 Vector Database Comparison
+
+| DB | Deployment | Best For |
+|----|------------|----------|
+| **ChromaDB** | Embedded (Python) | Prototypes, small data |
+| **Qdrant** | Standalone/Docker | Performance, production |
+| **LanceDB** | Embedded (Arrow) | Multi-modal, serverless |
+| **Faiss** | Library | Maximum control, scale |
+
+### D.4 Chunking Strategies
+
+| Content Type | Strategy |
+|--------------|----------|
+| Long documents | 300-500 tokens with 10-20% overlap |
+| Chat logs | Group consecutive messages by time window |
+| Emails | One email = one chunk (unless very long) |
+| Tweets/SMS | No chunking needed; use as-is |
+| PDFs | Split by paragraph or section headers |
+
+### D.5 Hybrid Search
+
+- **Blend semantic + lexical**: Catch exact keyword matches
+- **Use metadata filters**: source=SMS, year=2020
+- **Re-rank top-N**: Cross-encoder on top 50 candidates
+- **Exact-match fallbacks**: For error codes, IDs, rare terms
+
+### D.6 Caching
+
+- Cache embeddings keyed by text hash (MD5/SHA256)
+- Precompute static data (old emails, archives) overnight
+- LRU eviction for memory management
+- Cache query embeddings for repeated/similar questions
+
+### D.7 Dimension Reduction
+
+| Method | Reduction | Quality Loss |
+|--------|-----------|--------------|
+| PCA 768→128 | 83% | ~5% |
+| Autoencoder | Variable | Can be lower than PCA |
+| Matryoshka | First N dims | ~7% at 1/12 dims |
+
+---
+
+## E. Platform-Specific Ingestion Tips
+
+### E.1 iMessage (chat.db)
+
+```sql
+-- Key query pattern
+SELECT m.rowid, m.text, m.date, m.is_from_me, h.id as handle_id
+FROM message m
+LEFT JOIN handle h ON m.handle_id = h.rowid
+LEFT JOIN chat_message_join cmj ON m.rowid = cmj.message_id
+WHERE m.text IS NOT NULL
+```
+
+| Tip | Details |
+|-----|---------|
+| Timestamp conversion | `(date/1e9) + 978307200` → Unix time |
+| Newer macOS | Text in `attributedBody` (hex-serialized NSAttributedString) |
+| Attachments | Use `attachment` table, `filename` column has paths |
+| Conversation windows | Group messages within 60 minutes = one conversation |
+
+### E.2 Instagram (JSON Export)
+
+| Tip | Details |
+|-----|---------|
+| Multiple files | Iterate `messages/inbox/*/message_*.json` |
+| Encoding fix | If garbled, decode Latin-1 → UTF-8 |
+| Timestamps | Unix milliseconds, divide by 1000 |
+| Media | Reference files in export archive |
+
+### E.3 Facebook (JSON/HTML)
+
+| Tip | Details |
+|-----|---------|
+| Multi-part messages | Combine `message_1.json`, `message_2.json` in order |
+| Unicode fix | Multi-byte chars broken into `\u00XX` sequences |
+| Reactions | Array of reaction objects with emoji + actor |
+| Timestamps | `timestamp_ms` in milliseconds, UTC |
+
+### E.4 X/Twitter (JSON)
+
+| Tip | Details |
+|-----|---------|
+| Large files | Use streaming JSON parser (ijson) |
+| Large IDs | Treat as strings to avoid overflow |
+| Timestamps | Parse "Wed Oct 10 20:19:24 +0000 2025" format |
+| Threading | Use `in_reply_to_status_id` or `conversation_id` |
+
+### E.5 Gmail (MBOX)
+
+| Tip | Details |
+|-----|---------|
+| Use libraries | Python `mailbox` or `email` package |
+| Deduplication | Use `Message-ID` header |
+| Threading | Use `In-Reply-To` and `References` headers |
+| Large MBOX | Split by year/month, stream line by line |
+
+### E.6 Safari (History.db)
+
+```sql
+SELECT h.url, h.title, v.visit_time + 978307200 as unix_time
+FROM history_items h
+JOIN history_visits v ON h.id = v.history_item
+```
+
+### E.7 Apple Notes (NoteStore.sqlite)
+
+- Use `apple-notes-parser` library
+- Content is gzipped binary, needs decoding
+- Timestamps use Apple epoch (+978307200)
+- Attachments in separate table or files
+
+### E.8 Contacts (vCard)
+
+- Use vCard parsing library
+- Deduplicate by UID field
+- Photos are base64 encoded
+- Map to unified schema (first, last, phones[], emails[])
+
+### E.9 ChatGPT Export
+
+- Messages in tree structure, walk via `parent` pointers
+- Preserve `author.role` (user/assistant/system)
+- Content may have `parts` array, concatenate
+- Format changed in 2024, build flexible parser
+
+### E.10 PDFs
+
+- Use PyMuPDF or PDFBox for text extraction
+- OCR scanned PDFs with Tesseract
+- Extract metadata (title, author, dates)
+- Process in chunks for large files
+
+---
+
+## F. Cross-Platform Best Practices (25 Key Strategies)
+
+| # | Strategy | Description |
+|---|----------|-------------|
+| 1 | **UTF-8 everywhere** | Standardize all text encoding |
+| 2 | **Normalize Unicode** | NFC/NFD for consistent comparisons |
+| 3 | **Preserve raw data** | Archive originals for re-processing |
+| 4 | **Content hash dedup** | MD5/SHA256 to catch duplicates |
+| 5 | **UTC timestamps** | Single time standard, convert on ingestion |
+| 6 | **Timezone-aware storage** | Store UTC, convert for display |
+| 7 | **Unified attachments** | Single table with references, not BLOBs |
+| 8 | **Files on disk** | Don't store large binaries in DB |
+| 9 | **Thread/Conversation model** | Unified entity linking messages |
+| 10 | **Master contact table** | Map participants across platforms |
+| 11 | **Extensible metadata** | JSON field for platform-specific extras |
+| 12 | **Status indicators** | read/unread, starred, pinned fields |
+| 13 | **Batch processing** | Chunks of 1000 records, periodic commits |
+| 14 | **Parallel ingestion** | Multiple cores for huge datasets |
+| 15 | **Checkpoint/resume** | Progress log for interrupted jobs |
+| 16 | **Stream, don't load** | Generators for memory efficiency |
+| 17 | **Index key fields** | Timestamps, sender, thread_id |
+| 18 | **Archive originals** | Keep raw export files |
+| 19 | **Audit logs** | Log parsing errors with identifiers |
+| 20 | **Incremental updates** | Upsert by unique ID, don't duplicate |
+| 21 | **Encryption at rest** | Secure the unified storage |
+| 22 | **Compress text** | Text compresses well |
+| 23 | **Test on samples** | Validate edge cases before full run |
+| 24 | **Monitor resources** | CPU, memory during ingestion |
+| 25 | **Document schema mapping** | How each platform maps to unified schema |
+
+---
+
+## G. High-Impact Priorities (Top 20)
+
+Based on cross-referencing suggestions from multiple sources:
+
+### Tier 1: Foundation (Do First)
+
+1. **Contacts ingestor as ground truth** - Phone/email/social handles are canonical identifiers
+2. **60-minute conversation windows for iMessage** - Analyze conversations, not individual texts
+3. **UTF-8 normalization everywhere** - Prevents encoding bugs across all sources
+4. **Embed once, cache forever** - Generate embeddings for static data once
+5. **4-bit quantization for local LLMs** - 75% memory savings, minimal quality loss
+
+### Tier 2: Entity Resolution (Critical Path)
+
+6. **Deterministic ID matching first** - Same phone/email = same person (100% confidence)
+7. **Phonetic encoding (Soundex/Metaphone)** - Catch "Jon" vs "John"
+8. **Nickname dictionary** - Bob↔Robert, Liz↔Elizabeth mappings
+9. **Active learning with dedupe** - System improves from your corrections
+10. **Network proximity scoring** - Shared connections boost match confidence
+
+### Tier 3: Behavioral Analysis (Core Value)
+
+11. **Response latency distribution per contact** - Key relationship signal
+12. **Formality score per platform** - Captures persona switching
+13. **Turn-taking ratio** - Leadership/dominance in conversations
+14. **Initiation rate** - Who starts conversations
+15. **Sentiment volatility** - Emotional consistency/variability
+
+### Tier 4: Performance & Scale
+
+16. **Blocking before detailed matching** - Critical for scale
+17. **Hybrid search (vector + keyword)** - Don't miss exact matches
+18. **Hierarchical summarization** - Chunk → summarize → summarize summaries
+19. **Stream large files** - Never load 10GB+ into memory
+20. **Index timestamps + sender** - Fast queries on common patterns
+
+---
+
+## H. Quick Wins (Easy + High Value)
+
+| Win | Effort | Impact |
+|-----|--------|--------|
+| Use VADER for sentiment | 1 hour | Immediate tone analysis |
+| Add emoji histogram | 2 hours | Strong behavioral signal |
+| Implement response time tracking | 2 hours | Relationship strength proxy |
+| Create nickname dictionary | 1 hour | Better entity matching |
+| Enable 4-bit quantization | 30 min | 75% memory savings |
+| Cache embeddings to disk | 2 hours | Faster restarts |
+| Add conversation sessionization | 3 hours | Better context for analysis |
+| Normalize all timestamps to UTC | 2 hours | Cross-source timeline |
+
+---
+
+## I. Research Rabbit Holes Worth Exploring
+
+1. **Matryoshka embeddings** - OpenAI technique for using first N dims of larger embedding
+2. **Language Style Matching (LSM)** - Pennebaker's research on function-word alignment
+3. **Survival analysis for response times** - Hazard models for reply prediction
+4. **Federated learning for personal AI** - Privacy-preserving training approaches
+5. **Differential privacy on aggregates** - Mathematical privacy guarantees
+6. **Knowledge distillation** - Train smaller model on larger model's outputs
+7. **Siamese networks for entity matching** - Neural approach to record linkage
+8. **Graph neural networks for identity** - Node2Vec, GraphSAGE for entity embeddings
+9. **Cross-encoder re-ranking** - BERT-based final ranking of search results
+10. **Conversation analysis (CA)** - Academic field studying turn-taking, repair sequences
+
+---
+
+## J. Contrarian Ideas (Might Be Genius or Bad)
+
+| Idea | Potential | Risk |
+|------|-----------|------|
+| **Skip embeddings entirely** - Just use TF-IDF + cosine | Fast, simple, interpretable | May miss semantic similarity |
+| **Binary embeddings only** - 32× compression | Blazing fast search | Quality loss on nuanced queries |
+| **No LLM for inference** - Pure statistical features | Deterministic, fast, explainable | May miss complex patterns |
+| **Graph DB from day 1** - Neo4j instead of SQLite | Rich relationship queries | Overkill for MVP, slower dev |
+| **Fine-tune on your data** - LoRA on personal corpus | Perfect style matching | Expensive, risk of overfitting |
+| **Store raw text temporarily** - Delete after feature extraction | Maximum privacy | Can't re-analyze later |
+| **Behavior-only export** - Zero entity names to Ares | Maximum privacy | Less personalized responses |
+
+---
+
+## K. Safety & Ethics Guardrails
+
+If building a "clone," add safeguards against impersonation:
+
+1. **Visible disclosure**: "AI-assisted" label on all outputs
+2. **Audit logs**: Track all usage with timestamps
+3. **Strict scoping**: Only allowed to draft, never auto-send
+4. **Kill switch**: Instant revocation of Digital Spirit
+5. **No identity theft**: Don't impersonate in harmful contexts
+6. **Consent tracking**: Log what data was used for what inference
+7. **Right to delete**: User can purge any data/inference
+
+---
+
+## L. Architecture Pattern Summary
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         DATA FLOW PATTERN                                │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  RAW DATA                                                                │
+│     │                                                                    │
+│     ▼                                                                    │
+│  ┌─────────────┐                                                         │
+│  │  Ingestors  │ ── Platform-specific parsing                           │
+│  │             │ ── Timestamp normalization (UTC)                        │
+│  │             │ ── Encoding fix (UTF-8)                                 │
+│  └─────┬───────┘                                                         │
+│        │                                                                 │
+│        ▼                                                                 │
+│  ┌─────────────┐                                                         │
+│  │  Entity     │ ── Deterministic matching (phone/email)                │
+│  │  Resolution │ ── Fuzzy matching (name similarity)                    │
+│  │             │ ── Human confirmation for ambiguous                    │
+│  └─────┬───────┘                                                         │
+│        │                                                                 │
+│        ▼                                                                 │
+│  ┌─────────────┐                                                         │
+│  │  Feature    │ ── 70+ behavioral features                             │
+│  │  Extraction │ ── Stylometry, timing, sentiment                       │
+│  │             │ ── Per-contact, per-platform                           │
+│  └─────┬───────┘                                                         │
+│        │                                                                 │
+│        ▼                                                                 │
+│  ┌─────────────┐                                                         │
+│  │  Inference  │ ── Cross-source pattern detection                      │
+│  │  Generation │ ── LLM for complex reasoning                           │
+│  │             │ ── Confidence scoring                                  │
+│  └─────┬───────┘                                                         │
+│        │                                                                 │
+│        ▼                                                                 │
+│  ┌─────────────┐                                                         │
+│  │   Triage    │ ── Human approval/rejection                            │
+│  │   Interface │ ── Entity confirmation                                 │
+│  │             │ ── Feedback improves system                            │
+│  └─────┬───────┘                                                         │
+│        │                                                                 │
+│        ▼                                                                 │
+│  ┌─────────────┐                                                         │
+│  │  Digital    │ ── Behavioral patterns only                            │
+│  │  Spirit     │ ── No raw data                                         │
+│  │  Export     │ ── Encrypted JSON                                      │
+│  └─────┬───────┘                                                         │
+│        │                                                                 │
+│        ▼                                                                 │
+│     ARES (Remote) ── Uses patterns to "be you"                          │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+*End of Research Appendix*
