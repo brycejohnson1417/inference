@@ -3,6 +3,8 @@
 ## Overview
 This application is a "Tinder for Inferences" triage tool. It is designed to help you rapidly validate the insights your local AI extracts from your personal data (iMessage, Notes, Social Media exports).
 
+**Security note:** Exports are gated. The `/api/export` endpoint performs a heuristic secret scan (API keys/tokens/private keys) and will block export if potential secrets are detected.
+
 ## Features
 *   **Triage Interface**: Swipe-like interface to Approve (True) or Reject (False) inferences.
 *   **Context Aware**: Shows the source data (e.g., the text message) alongside the AI's conclusion.
@@ -13,6 +15,12 @@ This application is a "Tinder for Inferences" triage tool. It is designed to hel
 ### Prerequisites
 *   Python 3.10+
 *   `pip`
+
+Optional:
+- Set Ollama model (default is `llama3.2:3b`):
+  ```bash
+  export OLLAMA_MODEL="llama3.2:3b"
+  ```
 
 ### Installation
 1.  Install dependencies:

@@ -6,7 +6,9 @@ from typing import List, Dict, Any
 
 # Ollama Configuration
 OLLAMA_URL = "http://localhost:11434/api/generate"
-OLLAMA_MODEL = "llama3"
+# Use env var override so deployments can pin a specific local model.
+# Default aligns with Bryce's briefing.
+OLLAMA_MODEL = __import__("os").environ.get("OLLAMA_MODEL", "llama3.2:3b")
 
 # Fallback Mock Data (if Ollama is offline)
 MOCK_INFERENCES = [
