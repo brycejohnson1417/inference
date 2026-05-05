@@ -1,5 +1,7 @@
 # Digital Alchemy - Complete Implementation Plan
 
+> Public note: this is an older exploratory planning document. Treat all people, accounts, paths, and examples as synthetic placeholders. For the public-safe demo path, start with `README.md`, `docs/PUBLIC_DEMO_BOUNDARY.md`, and `docs/SYNTHETIC_TRIAGE_FLOW.md`.
+
 ## Vision Recap
 
 **Goal**: Create a secure "Digital Clone" that learns *how* you think, communicate, and present yourself across all digital platforms - without exposing raw data to the external agent (Ares).

@@ -2,6 +2,8 @@
 
 Inference Triage is a local-first review tool for validating AI-generated claims before they are allowed into a knowledge graph. The core idea is simple: model output should pass through a human approval layer before it becomes durable system memory.
 
+![Synthetic inference triage demo](assets/inference-triage-demo.png)
+
 ## What It Demonstrates
 
 - Human-in-the-loop validation for AI-generated inferences.
@@ -9,6 +11,14 @@ Inference Triage is a local-first review tool for validating AI-generated claims
 - JSON persistence for approved knowledge graph components.
 - Local model experimentation through Ollama.
 - Export safety checks that block likely API keys, tokens, and private keys.
+
+## Public-Safe Demo Materials
+
+- [Synthetic before/after triage flow](docs/SYNTHETIC_TRIAGE_FLOW.md)
+- [Architecture diagram and component notes](docs/ARCHITECTURE.md)
+- [Public demo boundary](docs/PUBLIC_DEMO_BOUNDARY.md)
+
+![Inference Triage architecture](assets/inference-architecture.svg)
 
 ## Public Demo Boundary
 

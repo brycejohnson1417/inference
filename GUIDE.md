@@ -1,51 +1,50 @@
 # Local Inference Triage Guide
 
-## Recommended Models for MacBook Pro M2 (16GB RAM)
+This guide describes how to run the prototype locally with generated mock data and evaluate the review workflow without exposing private source material.
 
-For your hardware (M2 Chip, 16GB RAM), you have a capable machine for local inference, but memory is your main constraint. Running a model *and* your operating system/apps means you should target models that use less than 12GB of RAM comfortably.
+## Recommended Local Models
 
-**Top Recommendations:**
+For a laptop-class machine with limited memory, use small or quantized models. The app does not require a hosted model for the public demo path.
 
-1.  **Llama 3 (8B Parameters)**
-    *   **Why:** State-of-the-art performance for its size.
-    *   **Format:** Quantized (Q4_K_M or Q5_K_M).
-    *   **Tool:** Use **Ollama** or **LM Studio**.
-    *   **Memory:** ~6-8 GB VRAM.
+Good starting points:
 
-2.  **Mistral 7B (v0.3)**
-    *   **Why:** Very capable, efficient, and good at reasoning.
-    *   **Format:** Quantized (Q4/Q5).
-    *   **Memory:** ~5-7 GB VRAM.
+1. **Llama 3.x 8B or smaller**
+   - Use a quantized build through Ollama or LM Studio.
+   - Useful for lightweight claim generation and summarization tests.
 
-**Avoid:** 70B+ models or unquantized 13B+ models, as they will likely swap to disk and run very slowly on 16GB RAM.
+2. **Mistral 7B-class models**
+   - Good speed/quality tradeoff for local reasoning tasks.
+   - Works well for structured extraction experiments.
 
-## Architecture: Building A Local Knowledge Review Loop
+Avoid very large or unquantized models on constrained hardware. They will usually run slowly and make the review loop harder to evaluate.
 
-The high-level architecture is a local-first review loop for turning raw personal exports into approved, structured knowledge without publishing the raw source material.
+## Local Knowledge Review Loop
 
-### 1. Data Ingestion (The Silos)
-You need scripts to export and normalize data from your sources:
-*   **Messages**: Read local SQLite database exports on macOS.
-*   **Notes/Email**: Export to text/markdown.
-*   **Socials (FB, Insta, X)**: Request GDPR data exports (JSON/HTML).
+The high-level architecture is a local-first review loop:
 
-### 2. The Knowledge Graph (Connecting the Dots)
-Instead of just RAG (Vector Search), you want a **Knowledge Graph**.
-*   **Nodes**: People, Places, Interests, Events.
-*   **Edges**: "Messaged", "Mentioned", "Attended", "Liked".
+1. Normalize source material into reviewable snippets.
+2. Generate proposed claims from those snippets.
+3. Require human approval before claims become durable knowledge.
+4. Export only approved structured claims.
+5. Block export when likely secrets are detected.
 
-*Example Inference:*
-*   *Input 1 (Text):* "Hey, are we still on for hiking the PCT?" (from `User` to `Bob`).
-*   *Input 2 (Insta):* `Bob` follows `#hiking`.
-*   *Inference:* `User` and `Bob` share interest `Hiking`.
+## Safe Demo Path
 
-### 3. Inference Triage (This Program)
-This is the "Human-in-the-loop" layer.
-*   The AI proposes new edges for the graph (Inferences).
-*   **You** validate them (True/False).
-*   This creates a "Gold Standard" dataset.
+Use the built-in synthetic data generator:
 
-### 4. Distilled Assistant Context
-Once you have enough validated inferences:
-*   Use them to configure a local or remote assistant.
-*   The assistant should receive approved patterns and summaries, not raw private records.
+```bash
+python scripts/generate_mock_data.py
+uvicorn app.main:app --reload
+```
+
+Then open:
+
+```text
+http://localhost:8000
+```
+
+## Data Boundary
+
+Public demos should not use real message exports, contact exports, social exports, browser history, notes, screenshots, API keys, tokens, or generated knowledge files based on private data.
+
+The safest public story is the workflow itself: generated claims are useful only after review.

@@ -1,66 +1,33 @@
-# Collaboration Guide: Orchestrating Your AI Agents
+# Collaboration Guide
 
-This guide answers your questions on how to manage a team of AI agents (Gemini, Claude, Grok, ChatGPT, etc.) working on this repository without stepping on each other's toes.
+This repository can be reviewed publicly when contributors respect the data boundary: use synthetic inputs, keep generated private outputs out of git, and treat the repo as a prototype for the review workflow.
 
-## 1. Should I make this GitHub Public?
+## Safety Rules
 
-**Verdict: Yes, but with strict safety measures.**
+- Do not commit real exports, browser histories, contact records, notes, screenshots, or generated private knowledge files.
+- Do not commit `.env` files, API keys, tokens, webhooks, database URLs, or private keys.
+- Use `scripts/generate_mock_data.py` for public demos and screenshots.
+- Keep JSON outputs ignored unless a specific synthetic fixture is intentionally added.
 
-**Why Public?**
-*   **Access:** Web-browsing agents (ChatGPT, Gemini, Perplexity) can instantly read your public code to understand the context. You can just paste the URL.
-*   **Speed:** It removes the friction of uploading zip files or copy-pasting code blocks to every agent.
+## Source Of Truth
 
-**⚠️ CRITICAL SAFETY WARNING ⚠️**
-Since this project involves local personal data exports, you must ensure **PRIVATE DATA NEVER REACHES GITHUB**.
-*   **Check your `.gitignore`**: We have already configured it to ignore `inferences.json` and `*.db`. Never remove these lines.
-*   **API Keys**: Never commit `.env` files or hardcoded keys.
-*   **Personal Info**: Do not put your actual phone number or address in the `mock_data.py`.
+Use the repo docs and current code as the source of truth before changing behavior.
 
-## 2. What is a "Pull Request" (PR)?
+Recommended read order:
 
-Think of a Pull Request as a **"Staging Area"** or a **"Change Proposal"**.
+1. `README.md`
+2. `docs/PUBLIC_DEMO_BOUNDARY.md`
+3. `docs/SYNTHETIC_TRIAGE_FLOW.md`
+4. `docs/ARCHITECTURE.md`
 
-1.  **The Branch**: An agent (or you) creates a copy of the code to work on a specific feature (e.g., `feature/add-neo4j`).
-2.  **The Commit**: Changes are saved to that branch.
-3.  **The Pull Request**: A request to merge that branch back into the `main` codebase.
+## Change Workflow
 
-**Your Role as the Human**:
-You are the **Gatekeeper**. Agents write the code, but you review the PR. You check:
-*   "Does this actually run?"
-*   "Did it break the old features?"
-*   "Is it trying to do something I didn't ask for?"
-*   **Merge**: If it looks good, you click "Merge", and it becomes part of the official `main` code.
+1. Create a focused branch for a specific improvement.
+2. Run the local app with synthetic data.
+3. Verify that approved exports still pass the safety gate.
+4. Keep screenshots and examples synthetic.
+5. Review diffs for accidental private data before committing.
 
-## 3. How to Achieve "Unity" (Speed & De-duplication)
+## Review Standard
 
-The biggest problem with using multiple LLMs is **Context Fragmentation**. Claude doesn't know what ChatGPT just wrote.
-
-### Strategy: "The Repo is the Source of Truth"
-
-To stop agents from redoing work:
-
-#### A. The "Context File" (`AGENTS.md` or `CURRENT_STATUS.md`)
-Create a file specifically for the agents to read. Update it before starting a session.
-*   **Example Content**:
-    ```markdown
-    # Current Status
-    - Backend is done (FastAPI).
-    - Frontend is done (HTML/JS).
-    - CURRENT GOAL: Connect SQLite database.
-    - DO NOT: Rewrite the CSS (it is finished).
-    ```
-
-#### B. Assign Roles (Specialization)
-Treat your LLMs like a specialized software team. Don't ask everyone to do everything.
-*   **Claude/Codex**: "You are the Senior Architect. Review this code and write the complex backend logic."
-*   **ChatGPT/Grok**: "You are the Product Manager. Read the code and tell me what features are missing based on my goals."
-*   **Gemini**: "You are the QA. Write tests for the code Claude just wrote."
-
-#### C. The Workflow Loop
-1.  **Pull** the latest `main` branch to your local machine.
-2.  **Paste** the relevant files (or GitHub URL) to Agent A.
-3.  **Agent A** writes code.
-4.  **You** commit that code to Git immediately.
-5.  **Paste** the *new* updated state to Agent B for the next step.
-
-**Rule of Thumb**: Never let two agents work on the same file at the same time.
+The most important question is not whether the model can generate claims. The important question is whether the system makes uncertainty visible and prevents unreviewed claims from becoming durable knowledge.

@@ -1,5 +1,7 @@
 # Research Prompts for Digital Alchemy Enhancement
 
+Public note: these prompts are exploratory research prompts. Do not paste private data, real exports, real contacts, private screenshots, credentials, or generated private knowledge files into external tools. Replace all examples with synthetic placeholders before reuse.
+
 Copy-paste these prompts into Gemini, Grok, ChatGPT, Deepseek, Notion AI, Perplexity, etc. to gather implementation ideas.
 
 ---

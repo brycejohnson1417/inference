@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620" role="img" aria-labelledby="title desc">
+  <title id="title">Inference Triage architecture diagram</title>
+  <desc id="desc">A local-first flow from synthetic source data through inference generation, human review, and export safety scanning.</desc>
+  <rect width="1200" height="620" fill="#f6f7f9"/>
+  <text x="70" y="78" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="#15171a">Inference Triage</text>
+  <text x="70" y="112" font-family="Arial, sans-serif" font-size="18" fill="#4d5560">Local-first review loop for AI-generated claims</text>
+
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#2f5d8c"/>
+    </marker>
+  </defs>
+
+  <g font-family="Arial, sans-serif">
+    <rect x="70" y="180" width="190" height="118" rx="10" fill="#ffffff" stroke="#cfd6df"/>
+    <text x="95" y="222" font-size="19" font-weight="700" fill="#15171a">Safe Inputs</text>
+    <text x="95" y="254" font-size="15" fill="#4d5560">Synthetic mock data</text>
+    <text x="95" y="278" font-size="15" fill="#4d5560">Local-only source files</text>
+
+    <rect x="330" y="180" width="190" height="118" rx="10" fill="#ffffff" stroke="#cfd6df"/>
+    <text x="355" y="222" font-size="19" font-weight="700" fill="#15171a">Inference Engine</text>
+    <text x="355" y="254" font-size="15" fill="#4d5560">Proposes claims</text>
+    <text x="355" y="278" font-size="15" fill="#4d5560">Adds confidence</text>
+
+    <rect x="590" y="180" width="190" height="118" rx="10" fill="#ffffff" stroke="#cfd6df"/>
+    <text x="615" y="222" font-size="19" font-weight="700" fill="#15171a">Review Queue</text>
+    <text x="615" y="254" font-size="15" fill="#4d5560">Approve</text>
+    <text x="615" y="278" font-size="15" fill="#4d5560">Reject or edit</text>
+
+    <rect x="850" y="180" width="220" height="118" rx="10" fill="#ffffff" stroke="#cfd6df"/>
+    <text x="875" y="222" font-size="19" font-weight="700" fill="#15171a">Export Guardrail</text>
+    <text x="875" y="254" font-size="15" fill="#4d5560">Blocks likely secrets</text>
+    <text x="875" y="278" font-size="15" fill="#4d5560">Exports approved claims</text>
+
+    <line x1="260" y1="239" x2="320" y2="239" stroke="#2f5d8c" stroke-width="3" marker-end="url(#arrow)"/>
+    <line x1="520" y1="239" x2="580" y2="239" stroke="#2f5d8c" stroke-width="3" marker-end="url(#arrow)"/>
+    <line x1="780" y1="239" x2="840" y2="239" stroke="#2f5d8c" stroke-width="3" marker-end="url(#arrow)"/>
+
+    <rect x="120" y="390" width="960" height="92" rx="10" fill="#eaf2fb" stroke="#b7cee5"/>
+    <text x="150" y="426" font-size="20" font-weight="700" fill="#17395d">Public demo boundary</text>
+    <text x="150" y="458" font-size="16" fill="#254d75">Use generated mock data. Keep real exports, raw notes, contacts, browser history, screenshots, and private keys out of public artifacts.</text>
+  </g>
+</svg>
