@@ -11,7 +11,7 @@ This guide answers your questions on how to manage a team of AI agents (Gemini, 
 *   **Speed:** It removes the friction of uploading zip files or copy-pasting code blocks to every agent.
 
 **⚠️ CRITICAL SAFETY WARNING ⚠️**
-Since this project involves your *personal digital spirit* (iMessage, Notes, etc.), you must ensure **PRIVATE DATA NEVER REACHES GITHUB**.
+Since this project involves local personal data exports, you must ensure **PRIVATE DATA NEVER REACHES GITHUB**.
 *   **Check your `.gitignore`**: We have already configured it to ignore `inferences.json` and `*.db`. Never remove these lines.
 *   **API Keys**: Never commit `.env` files or hardcoded keys.
 *   **Personal Info**: Do not put your actual phone number or address in the `mock_data.py`.

@@ -73,9 +73,9 @@ class Entity(BaseModel):
     """A resolved person/organization/concept across all sources"""
     id: str                          # Canonical ID (UUID)
     type: str                        # person, organization, place, concept
-    canonical_name: str              # "Logan Ruddick"
-    aliases: List[str]               # ["Logan", "looganoo", "LR"]
-    source_identifiers: Dict[str, str]  # {"instagram": "@looganoo", "imessage": "+1234567890"}
+    canonical_name: str              # "Alex Rivera"
+    aliases: List[str]               # ["Alex", "alex_demo", "LR"]
+    source_identifiers: Dict[str, str]  # {"instagram": "@alex_demo", "imessage": "+1234567890"}
     attributes: Dict[str, Any]       # {"business": "Fraternitees", "relationship": "friend"}
     first_seen: datetime
     sources: List[str]               # ["instagram", "imessage", "facebook"]
@@ -87,7 +87,7 @@ class EntityMention(BaseModel):
     id: str
     raw_data_id: str                 # Link to RawDataItem
     entity_id: Optional[str]         # Link to resolved Entity (None if unresolved)
-    mention_text: str                # "Logan", "@looganoo", etc.
+    mention_text: str                # "Alex", "@alex_demo", etc.
     context: str                     # Surrounding text for disambiguation
     source: str                      # "instagram", "imessage", etc.
     timestamp: Optional[datetime]
@@ -197,7 +197,7 @@ class EntityResolver:
 
     def propose_merge(self, mention: EntityMention, entity: Entity, confidence: float):
         """Create a merge candidate for user confirmation"""
-        # This creates the "Is Logan Ruddick the same as @looganoo?" prompt
+        # This creates the "Is Alex Rivera the same as @alex_demo?" prompt
         candidate = EntityCandidate(
             id=str(uuid4()),
             entity_a_id=mention.entity_id or self.create_temp_entity(mention).id,
@@ -243,15 +243,15 @@ Add to the triage interface:
 // Entity confirmation card
 {
   type: "entity_confirmation",
-  question: "Is Logan Ruddick (iMessage) the same as @looganoo (Instagram)?",
+  question: "Is Alex Rivera (iMessage) the same as @alex_demo (Instagram)?",
   entity_a: {
-    name: "Logan Ruddick",
+    name: "Alex Rivera",
     source: "iMessage",
     context: "Texts about Notion AI, AI tools",
     sample_messages: ["Hey did you try Notion AI?", "..."]
   },
   entity_b: {
-    name: "@looganoo",
+    name: "@alex_demo",
     source: "Instagram",
     bio: "@fraternitees",
     context: "DMs about ChatGPT",
@@ -259,7 +259,7 @@ Add to the triage interface:
   },
   evidence: [
     "Both discuss AI tools",
-    "Name similarity: Logan",
+    "Name similarity: Alex",
     "Both connected to you since ~2018"
   ],
   confidence: 0.72
@@ -398,13 +398,13 @@ class InferenceHistory:
     """
     Example evolution:
 
-    v1: "Logan is someone Bryce texts about AI"
+    v1: "Alex is someone User texts about AI"
         (source: iMessage only)
 
-    v2: "Logan Ruddick (@looganoo) is a close friend who shares AI interests"
+    v2: "Alex Rivera (@alex_demo) is a close friend who shares AI interests"
         (source: iMessage + Instagram merged)
 
-    v3: "Logan Ruddick, owner of Fraternitees, is one of Bryce's best friends
+    v3: "Alex Rivera, owner of Fraternitees, is one of User's best friends
          since high school. They frequently discuss AI, ChatGPT, Notion, and
          entrepreneurship. Communication style: casual, frequent, idea-sharing."
         (source: iMessage + Instagram + Facebook merged, confirmed by user)
@@ -778,12 +778,12 @@ class GenericUploadIngestor(BaseIngestor):
 
 ### 4.1 Focus on HOW, Not WHAT
 
-The key insight: Ares doesn't need to know "Bryce texted Logan about Notion AI". Ares needs to know:
+The key insight: Ares doesn't need to know "User messaged Alex about Notion AI". Ares needs to know:
 
-- **How** Bryce communicates with close friends (casual, frequent, idea-sharing)
-- **When** Bryce is most engaged in conversations (evenings, weekends)
-- **What triggers** Bryce to reach out (excitement about new tools, wanting feedback)
-- **How** Bryce presents himself differently across platforms
+- **How** User communicates with close friends (casual, frequent, idea-sharing)
+- **When** User is most engaged in conversations (evenings, weekends)
+- **What triggers** User to reach out (excitement about new tools, wanting feedback)
+- **How** User presents himself differently across platforms
 
 ### 4.2 Behavioral Inference Types
 
@@ -975,7 +975,7 @@ class DigitalSpiritExporter:
         """Relationship summaries - NO message content"""
         return [
             {
-                "entity": "Logan Ruddick",
+                "entity": "Alex Rivera",
                 "relationship_type": "close_friend",
                 "relationship_strength": 0.9,
                 "since": "high school",
@@ -1347,10 +1347,10 @@ You get "you-ness" without the gossip. This creates a **behavioral genome**: sta
 
 ```
 Person (node)
-  ├── HAS_ACCOUNT → Instagram Account (@looganoo)
+  ├── HAS_ACCOUNT → Instagram Account (@alex_demo)
   ├── HAS_ACCOUNT → iMessage Handle (+1234567890)
-  ├── HAS_ACCOUNT → Email (logan@example.com)
-  ├── ALIAS → "Logan", "LR", "Ruddick"
+  ├── HAS_ACCOUNT → Email (alex@example.com)
+  ├── ALIAS → "Alex", "AR", "Rivera"
   └── FRIEND_OF → Other Person nodes
 ```
 

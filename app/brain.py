@@ -7,14 +7,14 @@ from typing import List, Dict, Any
 # Ollama Configuration
 OLLAMA_URL = "http://localhost:11434/api/generate"
 # Use env var override so deployments can pin a specific local model.
-# Default aligns with Bryce's briefing.
+# Default can be overridden for local hardware constraints.
 OLLAMA_MODEL = __import__("os").environ.get("OLLAMA_MODEL", "llama3.2:3b")
 
 # Fallback Mock Data (if Ollama is offline)
 MOCK_INFERENCES = [
     {
-        "source": "iMessage",
-        "content": "Message to Mom: 'I'll bring the vegan salad.'",
+        "source": "Messages",
+        "content": "Message to a family member: 'I'll bring the vegan salad.'",
         "inference": "User prefers vegan food options.",
         "confidence": 0.88
     },

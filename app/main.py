@@ -105,7 +105,7 @@ async def triage_inference(request: TriageRequest):
 
 @app.get("/api/export")
 async def export_consciousness():
-    """Export all APPROVED inferences for Ares.
+    """Export all APPROVED inferences.
 
     Security: This endpoint blocks export if the payload appears to contain secrets
     (API keys, tokens, private keys, etc.).
@@ -126,7 +126,7 @@ async def export_consciousness():
 
     return JSONResponse(
         content=spirit_data,
-        headers={"Content-Disposition": "attachment; filename=ares_consciousness.json"},
+        headers={"Content-Disposition": "attachment; filename=approved_inferences.json"},
     )
 
 @app.post("/api/generate")

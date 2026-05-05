@@ -9,7 +9,7 @@ Copy-paste these prompts into Gemini, Grok, ChatGPT, Deepseek, Notion AI, Perple
 ```
 I'm building a local-first personal data system that ingests data from 15+ sources (iMessage, Instagram, Facebook, X, email, Safari history, ChatGPT exports, contacts, notes, etc.) and needs to resolve entities across them.
 
-Example challenge: "Logan Ruddick" in iMessage = "@looganoo" on Instagram = Facebook friend from high school. I need to detect these matches, ask the user to confirm, then merge all context.
+Example challenge: "Alex Rivera" in iMessage = "@alex_demo" on Instagram = Facebook friend from high school. I need to detect these matches, ask the user to confirm, then merge all context.
 
 Give me 50+ SHORT suggestions (1-2 sentences each) for:
 - Entity resolution algorithms and libraries
@@ -86,7 +86,7 @@ Give me 50+ SHORT suggestions for:
 ```
 I'm building a personal knowledge system that needs to:
 1. Embed text from 15+ data sources (messages, posts, browsing history)
-2. Find similar entities across sources ("Logan" in iMessage vs "@looganoo" on Instagram)
+2. Find similar entities across sources ("Alex" in iMessage vs "@alex_demo" on Instagram)
 3. Retrieve relevant context when generating inferences
 4. Run entirely locally on M2 MacBook
 
@@ -135,7 +135,7 @@ Give me 50+ SHORT suggestions for:
 ## Prompt 6: UI/UX for Human-in-the-Loop Triage
 
 ```
-I'm building a "Tinder for inferences" interface where users swipe to approve/reject AI-generated insights about themselves. Also need entity confirmation UI ("Is Logan Ruddick the same as @looganoo?").
+I'm building a "Tinder for inferences" interface where users swipe to approve/reject AI-generated insights about themselves. Also need entity confirmation UI ("Is Alex Rivera the same as @alex_demo?").
 
 Constraints:
 - Desktop web app (FastAPI + vanilla JS currently)
@@ -182,7 +182,7 @@ Give me 50+ SHORT suggestions for:
 - Audit logging without privacy leaks
 - Anonymization techniques that preserve utility
 - Academic research on privacy-preserving personal AI
-- How to handle entities (can I include "Logan Ruddick" or should it be hashed?)
+- How to handle entities (can I include "Alex Rivera" or should it be hashed?)
 - Federated learning concepts applicable here
 - Homomorphic encryption - practical or overkill?
 - GDPR/data portability compliance considerations
@@ -195,7 +195,7 @@ Give me 50+ SHORT suggestions for:
 ## Prompt 8: Incremental Re-Inference & Event Systems
 
 ```
-I'm building a system where new data or user confirmations should trigger re-evaluation of related inferences. Example: User confirms "Logan Ruddick = @looganoo" → system should re-generate all inferences involving either entity with the merged context.
+I'm building a system where new data or user confirmations should trigger re-evaluation of related inferences. Example: User confirms "Alex Rivera = @alex_demo" → system should re-generate all inferences involving either entity with the merged context.
 
 Give me 50+ SHORT suggestions for:
 - Event-driven architecture patterns for this use case
@@ -256,10 +256,10 @@ I have personal data from 15+ sources. The magic is in CROSS-SOURCE inferences:
 Example:
 - Safari: searched "best hiking boots"
 - Calendar: "Yosemite trip" next week
-- iMessage to Logan: "Can't wait for the hike"
+- iMessage to Alex: "Can't wait for the hike"
 - Instagram: liked posts about Half Dome
 
-Inference: "Planning hiking trip to Yosemite with Logan, researching gear, excited about Half Dome specifically"
+Inference: "Planning hiking trip to Yosemite with Alex, researching gear, excited about Half Dome specifically"
 
 Give me 50+ SHORT suggestions for:
 - Temporal alignment strategies (what happened "around the same time"?)
@@ -403,7 +403,7 @@ Give me 50+ SHORT suggestions for:
 - How Ares should load and use the Spirit (RAG? Fine-tuning? Context injection?)
 - Efficient inference on 4GB RAM constraints
 - How to personalize responses based on behavioral patterns
-- Handling requests about people in my life ("What would Logan think?")
+- Handling requests about people in my life ("What would Alex think?")
 - Graceful degradation when Spirit doesn't cover something
 - Requesting clarification back to local system
 - Update/sync protocols for Spirit changes

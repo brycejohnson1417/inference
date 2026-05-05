@@ -27,7 +27,7 @@ To create a "Digital Spirit" (a distillation of your personality, memories, and 
 We are upgrading the system from simple "Fact Extraction" to **Cross-Contextualized Intelligence**.
 
 ### Core Systems
-1.  **Entity Resolution**: Recognizing that "Mom", "Mother", and "Sandra" are the same person across iMessage, Email, and Photos.
+1.  **Entity Resolution**: Recognizing that "Mom", "Mother", and "Morgan" are the same person across iMessage, Email, and Photos.
 2.  **Temporal Reasoning**: Understanding *when* things happened.
     *   *Example*: "You used to like coffee, but switched to tea in 2024."
 3.  **Behavioral Archetypes**: Understanding *how* you act in different contexts.

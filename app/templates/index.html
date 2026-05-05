@@ -10,9 +10,9 @@
     <div class="container">
         <header>
             <h1>Inference Triage</h1>
-            <p>Help Ares understand you better.</p>
+            <p>Review AI-generated claims before they become durable knowledge.</p>
             <div style="margin-top: 10px;">
-                <button id="btn-export" class="btn-small" style="background-color: #6200ea;">⚗️ Export Spirit for Ares</button>
+                <button id="btn-export" class="btn-small" style="background-color: #6200ea;">Export Approved Inferences</button>
             </div>
             <div style="margin-top: 15px; border-top: 1px solid #ccc; padding-top: 10px;">
                 <h3>Behavioral Archetypes</h3>
@@ -28,12 +28,12 @@
                 <h3>Data Ingestion</h3>
                 <div class="input-group">
                     <label>ChatGPT Export Path:</label>
-                    <input type="text" id="path-chatgpt" placeholder="/Users/bryce/Downloads/package" style="width: 100%; margin-bottom: 5px;">
+                    <input type="text" id="path-chatgpt" placeholder="/Users/example/Downloads/package" style="width: 100%; margin-bottom: 5px;">
                     <button id="btn-ingest-chatgpt" class="btn-small">Load ChatGPT Data</button>
                 </div>
                 <div class="input-group" style="margin-top: 10px;">
                     <label>Safari History DB Path:</label>
-                    <input type="text" id="path-safari" placeholder="/Users/bryce/Library/Safari/History.db" style="width: 100%; margin-bottom: 5px;">
+                    <input type="text" id="path-safari" placeholder="/Users/example/Library/Safari/History.db" style="width: 100%; margin-bottom: 5px;">
                     <button id="btn-ingest-safari" class="btn-small">Load Safari History</button>
                 </div>
                 <div style="margin-top: 15px; text-align: center;">
@@ -91,11 +91,11 @@
                     const url = window.URL.createObjectURL(blob);
                     const a = document.createElement("a");
                     a.href = url;
-                    a.download = "ares_consciousness.json";
+                    a.download = "approved_inferences.json";
                     document.body.appendChild(a);
                     a.click();
                     a.remove();
-                    btn.textContent = "⚗️ Export Spirit for Ares";
+                    btn.textContent = "Export Approved Inferences";
                 } else {
                     alert("Failed to export.");
                     btn.textContent = "❌ Error";

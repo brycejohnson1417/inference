@@ -1,4 +1,4 @@
-# AI & Digital Spirit Guide
+# Local Inference Triage Guide
 
 ## Recommended Models for MacBook Pro M2 (16GB RAM)
 
@@ -19,13 +19,13 @@ For your hardware (M2 Chip, 16GB RAM), you have a capable machine for local infe
 
 **Avoid:** 70B+ models or unquantized 13B+ models, as they will likely swap to disk and run very slowly on 16GB RAM.
 
-## Architecture: Building Your "Digital Spirit"
+## Architecture: Building A Local Knowledge Review Loop
 
-To achieve your goal of a cross-silo "Digital Spirit", here is a high-level architecture:
+The high-level architecture is a local-first review loop for turning raw personal exports into approved, structured knowledge without publishing the raw source material.
 
 ### 1. Data Ingestion (The Silos)
 You need scripts to export and normalize data from your sources:
-*   **iMessage**: Read local SQLite database (`chat.db` on macOS).
+*   **Messages**: Read local SQLite database exports on macOS.
 *   **Notes/Email**: Export to text/markdown.
 *   **Socials (FB, Insta, X)**: Request GDPR data exports (JSON/HTML).
 
@@ -45,7 +45,7 @@ This is the "Human-in-the-loop" layer.
 *   **You** validate them (True/False).
 *   This creates a "Gold Standard" dataset.
 
-### 4. Fine-Tuning "Ares"
+### 4. Distilled Assistant Context
 Once you have enough validated inferences:
-*   Use them to fine-tune a model (LoRA) or strictly prompt your agent "Ares" on the VPS.
-*   Ares uses this structured knowledge to act as your true digital twin.
+*   Use them to configure a local or remote assistant.
+*   The assistant should receive approved patterns and summaries, not raw private records.

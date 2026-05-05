@@ -2,7 +2,7 @@ from typing import List, Optional
 
 class EntityResolver:
     """
-    Recognizes that "Mom", "Mother", "Sandra Johnson", "SJ" are the same entity.
+    Recognizes that "family member", "relative", "Morgan", and "M." can refer to the same entity.
     Critical for cross-source inference.
     """
 

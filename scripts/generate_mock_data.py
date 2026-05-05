@@ -6,9 +6,9 @@ DATA_FILE = "inferences.json"
 MOCK_INFERENCES = [
     {
         "id": str(uuid.uuid4()),
-        "source": "iMessage + Instagram",
-        "content": "iMessage: 'Hey, are you going to Sarah's party?' | Instagram: Found profile '@sarah_j' followed by mutuals.",
-        "inference": "The 'Sarah' mentioned in text is likely Instagram user '@sarah_j'.",
+        "source": "Messages + Social Export",
+        "content": "Message: 'Hey, are you going to Casey's event?' | Social export: Found profile '@casey_demo' followed by mutuals.",
+        "inference": "The 'Casey' mentioned in the message is likely social profile '@casey_demo'.",
         "confidence": 0.85,
         "status": "pending"
     },
@@ -23,8 +23,8 @@ MOCK_INFERENCES = [
     {
         "id": str(uuid.uuid4()),
         "source": "Notes App + Email",
-        "content": "Note: 'Gift ideas for Mom: Gardening tools' | Email: Receipt from Home Depot for 'Shovel'.",
-        "inference": "User's mother is interested in Gardening.",
+        "content": "Note: 'Gift ideas for a family member: Gardening tools' | Email: Receipt from a hardware store for 'Shovel'.",
+        "inference": "A family member is likely interested in gardening.",
         "confidence": 0.90,
         "status": "pending"
     },
